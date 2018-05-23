@@ -87,7 +87,12 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 		log.Fatal("closing the tmp config:", err)
 	}
 
-	return t.Parser.Parse(tmpfile.Name())
+	filename := tmpfile.Name() + ".json"
+	if err := os.Rename(tmpfile.Name(), filename); err != nil {
+		return nil, err
+	}
+
+	return t.Parser.Parse(filename)
 }
 
 func (t *TemplateParser) newConfigTemplate() *template.Template {
