@@ -47,8 +47,6 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			t.Vars[strings.TrimRight(filepath.Base(settingsFile.Name()), ".json")] = v
 		}
 	}
-	fmt.Println(cfg)
-	fmt.Println(t.Vars)
 	return t
 }
 
