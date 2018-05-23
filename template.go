@@ -34,7 +34,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			files = []os.FileInfo{}
 		}
 		for _, settingsFile := range files {
-			b, err := ioutil.ReadFile(settingsFile.Name())
+			b, err := ioutil.ReadFile(filepath.Join(cfg.Settings, settingsFile.Name()))
 			if err != nil {
 				fmt.Println("error procesing settings:", settingsFile, err)
 				continue
@@ -89,7 +89,7 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 
 	filename := tmpfile.Name() + ".json"
 	if err := os.Rename(tmpfile.Name(), filename); err != nil {
-		return nil, err
+		return config.ServiceConfig{}, err
 	}
 
 	return t.Parser.Parse(filename)
