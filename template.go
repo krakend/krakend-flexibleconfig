@@ -34,6 +34,9 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			files = []os.FileInfo{}
 		}
 		for _, settingsFile := range files {
+			if !strings.HasSuffix(settingsFile.Name(), ".json") {
+				continue
+			}
 			b, err := ioutil.ReadFile(filepath.Join(cfg.Settings, settingsFile.Name()))
 			if err != nil {
 				fmt.Println("error processing settings:", settingsFile, err)
@@ -44,7 +47,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 				fmt.Println("error processing settings:", settingsFile, err)
 				continue
 			}
-			t.Vars[strings.TrimRight(filepath.Base(settingsFile.Name()), ".json")] = v
+			t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), ".json")] = v
 		}
 	}
 	return t
