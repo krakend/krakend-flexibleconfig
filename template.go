@@ -105,7 +105,13 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 		return config.ServiceConfig{}, err
 	}
 
-	return t.Parser.Parse(filename)
+	cfg, err := t.Parser.Parse(filename)
+
+	if t.Path == "" {
+		os.Remove(filename)
+	}
+
+	return cfg, err
 }
 
 func (t *TemplateParser) newConfigTemplate() *template.Template {
