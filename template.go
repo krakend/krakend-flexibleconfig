@@ -47,8 +47,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 				fmt.Println("error processing settings:", settingsFile, err)
 				continue
 			}
-			k := filepath.Base(settingsFile.Name())
-			t.Vars[k[:len(k)-5]] = v
+			t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), ".json")] = v
 		}
 	}
 	return t
