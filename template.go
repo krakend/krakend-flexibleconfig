@@ -26,6 +26,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 		Partials: cfg.Partials,
 		Parser:   cfg.Parser,
 		Vars:     map[string]interface{}{},
+		err:      parserError{errors: map[string]error{}},
 	}
 	if cfg.Settings != "" {
 		files, err := ioutil.ReadDir(cfg.Settings)
@@ -40,11 +41,13 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			b, err := ioutil.ReadFile(filepath.Join(cfg.Settings, settingsFile.Name()))
 			if err != nil {
 				fmt.Println("error processing settings:", settingsFile, err)
+				t.err.errors[settingsFile.Name()] = err
 				continue
 			}
 			var v map[string]interface{}
 			if err := json.Unmarshal(b, &v); err != nil {
 				fmt.Println("error processing settings:", settingsFile, err)
+				t.err.errors[settingsFile.Name()] = err
 				continue
 			}
 			t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), ".json")] = v
@@ -57,9 +60,14 @@ type TemplateParser struct {
 	Vars     map[string]interface{}
 	Partials string
 	Parser   config.Parser
+	err      parserError
 }
 
 func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) {
+	if len(t.err.errors) != 0 {
+		return config.ServiceConfig{}, t.err
+	}
+
 	tmpfile, err := ioutil.TempFile("", "KrakenD_parsed_config_template_")
 	if err != nil {
 		log.Fatal("creating the tmp file:", err)
@@ -111,4 +119,18 @@ func (t *TemplateParser) marshal(v interface{}) string {
 func (t *TemplateParser) include(v interface{}) string {
 	a, _ := ioutil.ReadFile(path.Join(t.Partials, v.(string)))
 	return string(a)
+}
+
+type parserError struct {
+	errors map[string]error
+}
+
+func (p parserError) Error() string {
+	msgs := make([]string, len(p.errors))
+	var j int
+	for i, e := range p.errors {
+		msgs[j] = i + ": " + e.Error()
+		j++
+	}
+	return "parsing:\n" + strings.Join(msgs, "\n")
 }
