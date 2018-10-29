@@ -31,7 +31,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 	if cfg.Settings != "" {
 		files, err := ioutil.ReadDir(cfg.Settings)
 		if err != nil {
-			fmt.Println("error reading settings folder:", cfg.Settings, err)
+			t.err.errors[cfg.Settings] = err
 			files = []os.FileInfo{}
 		}
 		for _, settingsFile := range files {
@@ -40,13 +40,11 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			}
 			b, err := ioutil.ReadFile(filepath.Join(cfg.Settings, settingsFile.Name()))
 			if err != nil {
-				fmt.Println("error processing settings:", settingsFile, err)
 				t.err.errors[settingsFile.Name()] = err
 				continue
 			}
 			var v map[string]interface{}
 			if err := json.Unmarshal(b, &v); err != nil {
-				fmt.Println("error processing settings:", settingsFile, err)
 				t.err.errors[settingsFile.Name()] = err
 				continue
 			}
@@ -129,8 +127,8 @@ func (p parserError) Error() string {
 	msgs := make([]string, len(p.errors))
 	var j int
 	for i, e := range p.errors {
-		msgs[j] = i + ": " + e.Error()
+		msgs[j] = fmt.Sprintf("\t- %s: %s", i, e.Error())
 		j++
 	}
-	return "parsing:\n" + strings.Join(msgs, "\n")
+	return "loading flexible-config settings:\n" + strings.Join(msgs, "\n")
 }
