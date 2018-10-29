@@ -19,6 +19,7 @@ type Config struct {
 	Settings string
 	Partials string
 	Parser   config.Parser
+	Path     string
 }
 
 func NewTemplateParser(cfg Config) *TemplateParser {
@@ -26,6 +27,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 		Partials: cfg.Partials,
 		Parser:   cfg.Parser,
 		Vars:     map[string]interface{}{},
+		Path:     cfg.Path,
 		err:      parserError{errors: map[string]error{}},
 	}
 	if cfg.Settings != "" {
@@ -58,6 +60,7 @@ type TemplateParser struct {
 	Vars     map[string]interface{}
 	Partials string
 	Parser   config.Parser
+	Path     string
 	err      parserError
 }
 
@@ -95,6 +98,9 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 	}
 
 	filename := tmpfile.Name() + ".json"
+	if t.Path != "" {
+		filename = t.Path
+	}
 	if err := os.Rename(tmpfile.Name(), filename); err != nil {
 		return config.ServiceConfig{}, err
 	}
