@@ -33,6 +33,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 		Path:      cfg.Path,
 		err:       parserError{errors: map[string]error{}},
 	}
+
 	if cfg.Settings != "" {
 		files, err := ioutil.ReadDir(cfg.Settings)
 		if err != nil {
@@ -55,7 +56,9 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			}
 			t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), ".json")] = v
 		}
-	} else if cfg.Templates != "" {
+	}
+
+	if cfg.Templates != "" {
 		files, err := ioutil.ReadDir(cfg.Templates)
 		if err != nil {
 			t.err.errors[cfg.Templates] = err
@@ -68,6 +71,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			t.Templates = append(t.Templates, settingsFile.Name())
 		}
 	}
+
 	return t
 }
 
