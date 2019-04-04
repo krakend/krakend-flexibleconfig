@@ -17,19 +17,21 @@ import (
 )
 
 type Config struct {
-	Settings string
-	Partials string
-	Parser   config.Parser
-	Path     string
+	Settings  string
+	Partials  string
+	Templates string
+	Parser    config.Parser
+	Path      string
 }
 
 func NewTemplateParser(cfg Config) *TemplateParser {
 	t := &TemplateParser{
-		Partials: cfg.Partials,
-		Parser:   cfg.Parser,
-		Vars:     map[string]interface{}{},
-		Path:     cfg.Path,
-		err:      parserError{errors: map[string]error{}},
+		Partials:  cfg.Partials,
+		Templates: []string{},
+		Parser:    cfg.Parser,
+		Vars:      map[string]interface{}{},
+		Path:      cfg.Path,
+		err:       parserError{errors: map[string]error{}},
 	}
 	if cfg.Settings != "" {
 		files, err := ioutil.ReadDir(cfg.Settings)
@@ -53,16 +55,29 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			}
 			t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), ".json")] = v
 		}
+	} else if cfg.Templates != "" {
+		files, err := ioutil.ReadDir(cfg.Templates)
+		if err != nil {
+			t.err.errors[cfg.Templates] = err
+			files = []os.FileInfo{}
+		}
+		for _, settingsFile := range files {
+			if !strings.HasSuffix(settingsFile.Name(), ".tmpl") {
+				continue
+			}
+			t.Templates = append(t.Templates, settingsFile.Name())
+		}
 	}
 	return t
 }
 
 type TemplateParser struct {
-	Vars     map[string]interface{}
-	Partials string
-	Parser   config.Parser
-	Path     string
-	err      parserError
+	Vars      map[string]interface{}
+	Partials  string
+	Parser    config.Parser
+	Templates []string
+	Path      string
+	err       parserError
 }
 
 func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) {
@@ -83,6 +98,13 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 	if err != nil {
 		log.Fatal("parsing files:", err)
 		return t.Parser.Parse(configFile)
+	}
+	if len(t.Templates) > 0 {
+		tmpl, err = tmpl.ParseFiles(t.Templates...)
+		if err != nil {
+			log.Fatal("parsing files:", err)
+			return t.Parser.Parse(configFile)
+		}
 	}
 	err = tmpl.ExecuteTemplate(&buf, filepath.Base(configFile), t.Vars)
 	if err != nil {
