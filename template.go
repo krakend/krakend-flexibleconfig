@@ -68,7 +68,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			if !strings.HasSuffix(settingsFile.Name(), ".tmpl") {
 				continue
 			}
-			t.Templates = append(t.Templates, settingsFile.Name())
+			t.Templates = append(t.Templates, filepath.Join(cfg.Templates, settingsFile.Name()))
 		}
 	}
 
