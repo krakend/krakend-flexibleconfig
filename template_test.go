@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"text/template"
 
 	"github.com/devopsfaith/krakend/config"
 )
@@ -52,6 +53,11 @@ func ExampleTemplateParser_marshal() {
 			return expectedCfg, nil
 		}),
 	}
+
+	tmpl.FuncMap = template.FuncMap{
+		"marshal": tmpl.marshal,
+	}
+
 	res, err := tmpl.Parse(tmpfile.Name())
 	if err != nil {
 		fmt.Println(err.Error())
@@ -161,6 +167,11 @@ func ExampleTemplateParser_include() {
 			return expectedCfg, nil
 		}),
 	}
+
+	tmpl.FuncMap = template.FuncMap{
+		"include": tmpl.include,
+	}
+
 	res, err := tmpl.Parse(includeTmpfile.Name())
 	if err != nil {
 		fmt.Println(err.Error())
