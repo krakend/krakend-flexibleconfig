@@ -11,6 +11,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
 	"text/template"
 
 	"github.com/devopsfaith/krakend/config"
@@ -32,6 +33,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 		Vars:      map[string]interface{}{},
 		Path:      cfg.Path,
 		err:       parserError{errors: map[string]error{}},
+		mu:        new(sync.Mutex),
 	}
 
 	if cfg.Settings != "" {
@@ -88,13 +90,19 @@ type TemplateParser struct {
 	Path      string
 	err       parserError
 	funcMap   template.FuncMap
+	mu        *sync.Mutex
 }
 
 func (t *TemplateParser) AddFunc(name string, f interface{}) {
+	t.mu.Lock()
 	t.funcMap[name] = f
+	t.mu.Unlock()
 }
 
 func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
 	if len(t.err.errors) != 0 {
 		return config.ServiceConfig{}, t.err
 	}

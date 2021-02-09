@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sync"
 	"text/template"
 
 	"github.com/devopsfaith/krakend/config"
@@ -52,6 +53,7 @@ func ExampleTemplateParser_marshal() {
 			}
 			return expectedCfg, nil
 		}),
+		mu: new(sync.Mutex),
 	}
 
 	tmpl.funcMap = template.FuncMap{
@@ -166,6 +168,7 @@ func ExampleTemplateParser_include() {
 			}
 			return expectedCfg, nil
 		}),
+		mu: new(sync.Mutex),
 	}
 
 	tmpl.funcMap = template.FuncMap{
