@@ -54,7 +54,7 @@ func ExampleTemplateParser_marshal() {
 		}),
 	}
 
-	tmpl.FuncMap = template.FuncMap{
+	tmpl.funcMap = template.FuncMap{
 		"marshal": tmpl.marshal,
 	}
 
@@ -168,7 +168,7 @@ func ExampleTemplateParser_include() {
 		}),
 	}
 
-	tmpl.FuncMap = template.FuncMap{
+	tmpl.funcMap = template.FuncMap{
 		"include": tmpl.include,
 	}
 
