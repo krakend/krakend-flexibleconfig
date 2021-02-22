@@ -72,6 +72,11 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 		}
 	}
 
+	t.funcMap = template.FuncMap{
+		"marshal": t.marshal,
+		"include": t.include,
+	}
+
 	return t
 }
 
@@ -82,6 +87,11 @@ type TemplateParser struct {
 	Templates []string
 	Path      string
 	err       parserError
+	funcMap   template.FuncMap
+}
+
+func (t *TemplateParser) AddFunc(name string, f interface{}) {
+	t.funcMap[name] = f
 }
 
 func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) {
@@ -98,7 +108,7 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 
 	var buf bytes.Buffer
 
-	tmpl, err := t.newConfigTemplate().ParseFiles(configFile)
+	tmpl, err := template.New("config").Funcs(t.funcMap).ParseFiles(configFile)
 	if err != nil {
 		log.Fatal("parsing files:", err)
 		return t.Parser.Parse(configFile)
@@ -139,13 +149,6 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 	}
 
 	return cfg, err
-}
-
-func (t *TemplateParser) newConfigTemplate() *template.Template {
-	return template.New("config").Funcs(template.FuncMap{
-		"marshal": t.marshal,
-		"include": t.include,
-	})
 }
 
 func (t *TemplateParser) marshal(v interface{}) string {
