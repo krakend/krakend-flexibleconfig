@@ -6,6 +6,7 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/Masterminds/sprig"
 	"github.com/devopsfaith/krakend/config"
 )
 
@@ -54,9 +55,8 @@ func ExampleTemplateParser_marshal() {
 		}),
 	}
 
-	tmpl.funcMap = template.FuncMap{
-		"marshal": tmpl.marshal,
-	}
+	tmpl.funcMap = sprig.GenericFuncMap()
+	tmpl.funcMap["marshal"] = tmpl.marshal
 
 	res, err := tmpl.Parse(tmpfile.Name())
 	if err != nil {
@@ -185,7 +185,7 @@ func ExampleTemplateParser_include() {
 
 	// Output:
 	// {
-	//     "version": 42,
+	//     "version": {{ add 40 2 }},
 	//     "port": {{ .Port }},
 	//     "endpoints": [
 	//         {
@@ -233,7 +233,7 @@ func ExampleTemplateParser_include() {
 }
 
 var originalTemplate = []byte(`{
-    "version": 42,
+    "version": {{ add 40 2 }},
     "port": {{ .Port }},
     "endpoints": [
         {
