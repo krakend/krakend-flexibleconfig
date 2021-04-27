@@ -13,6 +13,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/Masterminds/sprig"
 	"github.com/devopsfaith/krakend/config"
 )
 
@@ -72,10 +73,9 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 		}
 	}
 
-	t.funcMap = template.FuncMap{
-		"marshal": t.marshal,
-		"include": t.include,
-	}
+	t.funcMap = sprig.GenericFuncMap()
+	t.funcMap["marshal"] = t.marshal
+	t.funcMap["include"] = t.include
 
 	return t
 }
