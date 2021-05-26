@@ -14,7 +14,7 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
-	"github.com/devopsfaith/krakend/config"
+	"github.com/luraproject/lura/config"
 )
 
 type Config struct {
