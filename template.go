@@ -15,6 +15,7 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/luraproject/lura/config"
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
@@ -42,20 +43,33 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			files = []os.FileInfo{}
 		}
 		for _, settingsFile := range files {
-			if !strings.HasSuffix(settingsFile.Name(), ".json") {
+			lastDot := strings.LastIndex(settingsFile.Name(), ".")
+			suffix := settingsFile.Name()[lastDot:]
+
+			if suffix != ".json" &&	suffix != ".yaml" && suffix != ".yml" {
 				continue
 			}
+
 			b, err := ioutil.ReadFile(filepath.Join(cfg.Settings, settingsFile.Name()))
 			if err != nil {
 				t.err.errors[settingsFile.Name()] = err
 				continue
 			}
+
 			var v map[string]interface{}
-			if err := json.Unmarshal(b, &v); err != nil {
-				t.err.errors[settingsFile.Name()] = err
-				continue
+			if suffix == ".json" {
+				if err := json.Unmarshal(b, &v); err != nil {
+					t.err.errors[settingsFile.Name()] = err
+					continue
+				}
+			} else { // "yaml" or "yml"
+				if err := yaml.Unmarshal(b, &v); err != nil {
+					t.err.errors[settingsFile.Name()] = err
+					continue
+				}
 			}
-			t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), ".json")] = v
+
+			t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), suffix)] = v
 		}
 	}
 
