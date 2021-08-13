@@ -43,9 +43,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			files = []os.FileInfo{}
 		}
 		for _, settingsFile := range files {
-			lastDot := strings.LastIndex(settingsFile.Name(), ".")
-			suffix := settingsFile.Name()[lastDot:]
-
+			suffix := fileSuffix(settingsFile.Name())
 			if suffix != ".json" &&	suffix != ".yaml" && suffix != ".yml" {
 				continue
 			}
@@ -114,6 +112,8 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 		return config.ServiceConfig{}, t.err
 	}
 
+	suffix := fileSuffix(configFile)
+
 	tmpfile, err := ioutil.TempFile("", "KrakenD_parsed_config_template_")
 	if err != nil {
 		log.Fatal("creating the tmp file:", err)
@@ -149,7 +149,7 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 		log.Fatal("closing the tmp config:", err)
 	}
 
-	filename := tmpfile.Name() + ".json"
+	filename := tmpfile.Name() + suffix
 	if t.Path != "" {
 		filename = t.Path
 	}
@@ -245,4 +245,9 @@ func copyFile(src, dst string) (err error) {
 	}
 
 	return
+}
+
+func fileSuffix(s string) string {
+	lastDot := strings.LastIndex(s, ".")
+	return s[lastDot:]
 }
