@@ -90,6 +90,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 	t.funcMap = sprig.GenericFuncMap()
 	t.funcMap["marshal"] = t.marshal
 	t.funcMap["include"] = t.include
+	t.funcMap["toYaml"] = t.toYaml
 
 	return t
 }
@@ -167,6 +168,11 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 
 func (t *TemplateParser) marshal(v interface{}) string {
 	a, _ := json.Marshal(v)
+	return string(a)
+}
+
+func (t *TemplateParser) toYaml(v interface{}) string {
+	a, _ := yaml.Marshal(v)
 	return string(a)
 }
 
