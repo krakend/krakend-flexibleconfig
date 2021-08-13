@@ -12,4 +12,5 @@ require (
 	github.com/luraproject/lura v1.4.0 // indirect
 	github.com/mitchellh/copystructure v1.1.1 // indirect
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
