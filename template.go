@@ -15,6 +15,7 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/luraproject/lura/config"
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
@@ -42,20 +43,31 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 			files = []os.FileInfo{}
 		}
 		for _, settingsFile := range files {
-			if !strings.HasSuffix(settingsFile.Name(), ".json") {
+			suffix := fileSuffix(settingsFile.Name())
+			if suffix != ".json" &&	suffix != ".yaml" && suffix != ".yml" {
 				continue
 			}
+
 			b, err := ioutil.ReadFile(filepath.Join(cfg.Settings, settingsFile.Name()))
 			if err != nil {
 				t.err.errors[settingsFile.Name()] = err
 				continue
 			}
+
 			var v map[string]interface{}
-			if err := json.Unmarshal(b, &v); err != nil {
-				t.err.errors[settingsFile.Name()] = err
-				continue
+			if suffix == ".json" {
+				if err := json.Unmarshal(b, &v); err != nil {
+					t.err.errors[settingsFile.Name()] = err
+					continue
+				}
+			} else { // "yaml" or "yml"
+				if err := yaml.Unmarshal(b, &v); err != nil {
+					t.err.errors[settingsFile.Name()] = err
+					continue
+				}
 			}
-			t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), ".json")] = v
+
+			t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), suffix)] = v
 		}
 	}
 
@@ -76,6 +88,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 	t.funcMap = sprig.GenericFuncMap()
 	t.funcMap["marshal"] = t.marshal
 	t.funcMap["include"] = t.include
+	t.funcMap["toYaml"] = t.toYaml
 
 	return t
 }
@@ -98,6 +111,8 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 	if len(t.err.errors) != 0 {
 		return config.ServiceConfig{}, t.err
 	}
+
+	suffix := fileSuffix(configFile)
 
 	tmpfile, err := ioutil.TempFile("", "KrakenD_parsed_config_template_")
 	if err != nil {
@@ -134,7 +149,7 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 		log.Fatal("closing the tmp config:", err)
 	}
 
-	filename := tmpfile.Name() + ".json"
+	filename := tmpfile.Name() + suffix
 	if t.Path != "" {
 		filename = t.Path
 	}
@@ -153,6 +168,11 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 
 func (t *TemplateParser) marshal(v interface{}) string {
 	a, _ := json.Marshal(v)
+	return string(a)
+}
+
+func (t *TemplateParser) toYaml(v interface{}) string {
+	a, _ := yaml.Marshal(v)
 	return string(a)
 }
 
@@ -225,4 +245,9 @@ func copyFile(src, dst string) (err error) {
 	}
 
 	return
+}
+
+func fileSuffix(s string) string {
+	lastDot := strings.LastIndex(s, ".")
+	return s[lastDot:]
 }
