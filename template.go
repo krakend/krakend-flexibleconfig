@@ -14,7 +14,7 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
-	"github.com/luraproject/lura/config"
+	"github.com/luraproject/lura/v2/config"
 )
 
 type Config struct {
@@ -101,7 +101,7 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 
 	tmpfile, err := ioutil.TempFile("", "KrakenD_parsed_config_template_")
 	if err != nil {
-		log.Fatal("creating the tmp file:", err)
+		log.Fatal("Couldn't create the temporary file:", err)
 	}
 
 	defer os.Remove(tmpfile.Name())
@@ -110,28 +110,28 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 
 	tmpl, err := template.New("config").Funcs(t.funcMap).ParseFiles(configFile)
 	if err != nil {
-		log.Fatal("parsing files:", err)
+		log.Fatal("Unable to parse configuration file:", err)
 		return t.Parser.Parse(configFile)
 	}
 	if len(t.Templates) > 0 {
 		tmpl, err = tmpl.ParseFiles(t.Templates...)
 		if err != nil {
-			log.Fatal("parsing files:", err)
+			log.Fatal("Error parsing sub-templates:", err)
 			return t.Parser.Parse(configFile)
 		}
 	}
 	err = tmpl.ExecuteTemplate(&buf, filepath.Base(configFile), t.Vars)
 	if err != nil {
-		log.Fatal("executing template:", err)
+		log.Fatal("Found error while executing template:", err)
 		return t.Parser.Parse(configFile)
 	}
 
 	if _, err = tmpfile.Write(buf.Bytes()); err != nil {
-		log.Fatal("writing the tmp config:", err)
+		log.Fatal("Unable to write the temporary configuration file:", err)
 		return t.Parser.Parse(configFile)
 	}
 	if err = tmpfile.Close(); err != nil {
-		log.Fatal("closing the tmp config:", err)
+		log.Fatal("Unable to close the file after writing:", err)
 	}
 
 	filename := tmpfile.Name() + ".json"
