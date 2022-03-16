@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
@@ -36,27 +37,33 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 	}
 
 	if cfg.Settings != "" {
-		files, err := ioutil.ReadDir(cfg.Settings)
-		if err != nil {
-			t.err.errors[cfg.Settings] = err
-			files = []os.FileInfo{}
-		}
-		for _, settingsFile := range files {
-			if !strings.HasSuffix(settingsFile.Name(), ".json") {
-				continue
+		_ = filepath.Walk(cfg.Settings, func(path string, info fs.FileInfo, err error) error {
+			if info.IsDir() {
+				return nil
 			}
-			b, err := ioutil.ReadFile(filepath.Join(cfg.Settings, settingsFile.Name()))
+			if !strings.HasSuffix(info.Name(), ".json") {
+				return nil
+			}
+			b, err := ioutil.ReadFile(path)
 			if err != nil {
-				t.err.errors[settingsFile.Name()] = err
-				continue
+				t.err.errors[path] = err
+				return nil
 			}
+
 			var v map[string]interface{}
 			if err := json.Unmarshal(b, &v); err != nil {
-				t.err.errors[settingsFile.Name()] = err
-				continue
+				t.err.errors[path] = err
+				return nil
 			}
-			t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), ".json")] = v
-		}
+
+			key := strings.ReplaceAll(path, "/", "_")
+			key = strings.TrimPrefix(key, fmt.Sprintf("%s_", cfg.Settings))
+			key = strings.TrimSuffix(key, ".json")
+
+			t.Vars[key] = v
+
+			return nil
+		})
 	}
 
 	if cfg.Templates != "" {
@@ -104,31 +111,29 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 		log.Fatal("Couldn't create the temporary file:", err)
 	}
 
-	defer os.Remove(tmpfile.Name())
+	defer func() {
+		_ = os.Remove(tmpfile.Name())
+	}()
 
 	var buf bytes.Buffer
 
 	tmpl, err := template.New("config").Funcs(t.funcMap).ParseFiles(configFile)
 	if err != nil {
 		log.Fatal("Unable to parse configuration file:", err)
-		return t.Parser.Parse(configFile)
 	}
 	if len(t.Templates) > 0 {
 		tmpl, err = tmpl.ParseFiles(t.Templates...)
 		if err != nil {
 			log.Fatal("Error parsing sub-templates:", err)
-			return t.Parser.Parse(configFile)
 		}
 	}
 	err = tmpl.ExecuteTemplate(&buf, filepath.Base(configFile), t.Vars)
 	if err != nil {
 		log.Fatal("Found error while executing template:", err)
-		return t.Parser.Parse(configFile)
 	}
 
 	if _, err = tmpfile.Write(buf.Bytes()); err != nil {
 		log.Fatal("Unable to write the temporary configuration file:", err)
-		return t.Parser.Parse(configFile)
 	}
 	if err = tmpfile.Close(); err != nil {
 		log.Fatal("Unable to close the file after writing:", err)
@@ -145,7 +150,7 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 	cfg, err := t.Parser.Parse(filename)
 
 	if t.Path == "" {
-		os.Remove(filename)
+		_ = os.Remove(filename)
 	}
 
 	return cfg, err
@@ -193,7 +198,9 @@ func copyFile(src, dst string) (err error) {
 	if err != nil {
 		return
 	}
-	defer in.Close()
+	defer func() {
+		_ = in.Close()
+	}()
 
 	out, err := os.Create(dst)
 	if err != nil {

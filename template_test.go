@@ -17,7 +17,10 @@ func ExampleTemplateParser_marshal() {
 		return
 	}
 
-	defer os.Remove(tmpfile.Name())
+	defer func() {
+		_ = os.Remove(tmpfile.Name())
+	}()
+
 	if _, err := tmpfile.Write(originalTemplate); err != nil {
 		fmt.Println(err.Error())
 		return
@@ -125,7 +128,9 @@ func ExampleTemplateParser_include() {
 		return
 	}
 
-	defer os.Remove(tmpfile.Name())
+	defer func() {
+		_ = os.Remove(tmpfile.Name())
+	}()
 	if _, err := tmpfile.Write(originalTemplate); err != nil {
 		fmt.Println(err.Error())
 		return
@@ -141,7 +146,10 @@ func ExampleTemplateParser_include() {
 		return
 	}
 
-	defer os.Remove(includeTmpfile.Name())
+	defer func() {
+		_ = os.Remove(includeTmpfile.Name())
+	}()
+
 	if _, err := includeTmpfile.Write([]byte(fmt.Sprintf("{{ include \"%s\" }}", tmpfile.Name()))); err != nil {
 		fmt.Println(err.Error())
 		return
