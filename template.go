@@ -56,8 +56,8 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 				return nil
 			}
 
-			key := strings.ReplaceAll(path, "/", "_")
-			key = strings.TrimPrefix(key, fmt.Sprintf("%s_", cfg.Settings))
+			key := strings.ReplaceAll(filepath.ToSlash(path), "/", "_")
+			key = strings.TrimPrefix(key, fmt.Sprintf("%s_", strings.ReplaceAll(filepath.ToSlash(cfg.Settings), "/", "_")))
 			key = strings.TrimSuffix(key, ".json")
 
 			t.Vars[key] = v
