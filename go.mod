@@ -1,4 +1,4 @@
-module github.com/devopsfaith/krakend-flexibleconfig/v2
+module github.com/krakendio/krakend-flexibleconfig/v2
 
 go 1.17
 
