@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/luraproject/lura/v2 v2.0.0
+	github.com/luraproject/lura/v2 v2.0.0-20220601150625-abb94fb9730d
 )
 
 require (

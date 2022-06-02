@@ -12,6 +12,8 @@ github.com/huandu/xstrings v1.3.2 h1:L18LIDzqlW6xN2rEkpdV8+oL/IXWJ1APd+vsdYy4Wdw
 github.com/huandu/xstrings v1.3.2/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/imdario/mergo v0.3.12 h1:b6R2BslTbIEToALKP7LxUvijTsNI9TAe80pLWN2g/HU=
 github.com/imdario/mergo v0.3.12/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
+github.com/luraproject/lura/v2 v2.0.0-20220601150625-abb94fb9730d h1:XmVeK0wbQ/cY2yQP0uH7ztF5wzpgBLv4oFlVUFWZ0Bo=
+github.com/luraproject/lura/v2 v2.0.0-20220601150625-abb94fb9730d/go.mod h1:M13cN+J+5/pXZx46zZVT9h+36kPPvcFA/Jcuk45xSZw=
 github.com/luraproject/lura/v2 v2.0.0 h1:nfIr4a8XLMECaPQBpGSWxXhNAya7JQwGa3kzLRy5z14=
 github.com/luraproject/lura/v2 v2.0.0/go.mod h1:1FhL+5a9uH6o7zMNstXlcjznL5yt2lZ9Q8efanmvw9w=
 github.com/mitchellh/copystructure v1.1.1 h1:Bp6x9R1Wn16SIz3OfeDr0b7RnCG2OB66Y7PQyC/cvq4=
