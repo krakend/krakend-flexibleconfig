@@ -175,7 +175,7 @@ func (p parserError) Error() string {
 	return "loading flexible-config settings:\n" + strings.Join(msgs, "\n")
 }
 
-func renameFile(src string, dst string) (err error) {
+func renameFile(src, dst string) (err error) {
 	err = copyFile(src, dst)
 	if err != nil {
 		return fmt.Errorf("failed to copy source file %s to %s: %s", src, dst, err)
