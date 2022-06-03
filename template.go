@@ -151,7 +151,7 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 	return cfg, err
 }
 
-func (t *TemplateParser) marshal(v interface{}) string {
+func (*TemplateParser) marshal(v interface{}) string {
 	a, _ := json.Marshal(v)
 	return string(a)
 }
