@@ -16,6 +16,8 @@ github.com/luraproject/lura/v2 v2.0.0-20220601150625-abb94fb9730d h1:XmVeK0wbQ/c
 github.com/luraproject/lura/v2 v2.0.0-20220601150625-abb94fb9730d/go.mod h1:M13cN+J+5/pXZx46zZVT9h+36kPPvcFA/Jcuk45xSZw=
 github.com/luraproject/lura/v2 v2.0.0 h1:nfIr4a8XLMECaPQBpGSWxXhNAya7JQwGa3kzLRy5z14=
 github.com/luraproject/lura/v2 v2.0.0/go.mod h1:1FhL+5a9uH6o7zMNstXlcjznL5yt2lZ9Q8efanmvw9w=
+github.com/luraproject/lura/v2 v2.0.5 h1:Mc4uj37s7mv6qRLy+Uo983CiaITPSVJYooeUilbiD+k=
+github.com/luraproject/lura/v2 v2.0.5/go.mod h1:r2N4j89Snm1j+Y9CCa9cYR1T2ETRL0E4y9P+DgymqX4=
 github.com/mitchellh/copystructure v1.1.1 h1:Bp6x9R1Wn16SIz3OfeDr0b7RnCG2OB66Y7PQyC/cvq4=
 github.com/mitchellh/copystructure v1.1.1/go.mod h1:EBArHfARyrSWO/+Wyr9zwEkc6XMFB9XyNgFNmRkZZU4=
 github.com/mitchellh/reflectwalk v1.0.1 h1:FVzMWA5RllMAKIdUSC8mdWo3XtwoecrH79BY70sEEpE=
