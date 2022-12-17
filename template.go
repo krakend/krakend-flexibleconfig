@@ -60,17 +60,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 	}
 
 	if cfg.Templates != "" {
-		files, err := ioutil.ReadDir(cfg.Templates)
-		if err != nil {
-			t.err.errors[cfg.Templates] = err
-			files = []os.FileInfo{}
-		}
-		for _, settingsFile := range files {
-			if !strings.HasSuffix(settingsFile.Name(), ".tmpl") {
-				continue
-			}
-			t.Templates = append(t.Templates, filepath.Join(cfg.Templates, settingsFile.Name()))
-		}
+		readTemplatesFromDirectory(cfg, t)
 	}
 
 	t.funcMap = sprig.GenericFuncMap()
@@ -78,6 +68,29 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 	t.funcMap["include"] = t.include
 
 	return t
+}
+
+func readTemplatesFromDirectory(cfg Config, t *TemplateParser) {
+	err := filepath.Walk(
+		cfg.Templates,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if !strings.HasSuffix(info.Name(), `.tmpl`) {
+				return nil
+			}
+			t.Templates = append(t.Templates, path)
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		t.err.errors[cfg.Templates] = err
+		t.Templates = []string{}
+	}
 }
 
 type TemplateParser struct {
