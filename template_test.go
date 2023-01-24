@@ -2,7 +2,6 @@ package flexibleconfig
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"text/template"
 
@@ -11,7 +10,7 @@ import (
 )
 
 func ExampleTemplateParser_marshal() {
-	tmpfile, err := ioutil.TempFile("", "KrakenD_parsed_config_template_0_")
+	tmpfile, err := os.CreateTemp("", "KrakenD_parsed_config_template_0_")
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -119,7 +118,7 @@ func ExampleTemplateParser_marshal() {
 }
 
 func ExampleTemplateParser_include() {
-	tmpfile, err := ioutil.TempFile("", "KrakenD_parsed_config_template_1_")
+	tmpfile, err := os.CreateTemp("", "KrakenD_parsed_config_template_1_")
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -135,7 +134,7 @@ func ExampleTemplateParser_include() {
 		return
 	}
 
-	includeTmpfile, err := ioutil.TempFile("", "KrakenD_parsed_config_template_2_")
+	includeTmpfile, err := os.CreateTemp("", "KrakenD_parsed_config_template_2_")
 	if err != nil {
 		fmt.Println(err.Error())
 		return
