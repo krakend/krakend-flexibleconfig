@@ -13,7 +13,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/Masterminds/sprig"
+	"github.com/Masterminds/sprig/v3"
 	"github.com/luraproject/lura/v2/config"
 )
 
@@ -36,16 +36,16 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 	}
 
 	if cfg.Settings != "" {
-		files, err := ioutil.ReadDir(cfg.Settings)
+		files, err := os.ReadDir(cfg.Settings)
 		if err != nil {
 			t.err.errors[cfg.Settings] = err
-			files = []os.FileInfo{}
+			files = []os.DirEntry{}
 		}
 		for _, settingsFile := range files {
 			if !strings.HasSuffix(settingsFile.Name(), ".json") {
 				continue
 			}
-			b, err := ioutil.ReadFile(filepath.Join(cfg.Settings, settingsFile.Name()))
+			b, err := os.ReadFile(filepath.Join(cfg.Settings, settingsFile.Name()))
 			if err != nil {
 				t.err.errors[settingsFile.Name()] = err
 				continue
@@ -60,10 +60,10 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 	}
 
 	if cfg.Templates != "" {
-		files, err := ioutil.ReadDir(cfg.Templates)
+		files, err := os.ReadDir(cfg.Templates)
 		if err != nil {
 			t.err.errors[cfg.Templates] = err
-			files = []os.FileInfo{}
+			files = []os.DirEntry{}
 		}
 		for _, settingsFile := range files {
 			if !strings.HasSuffix(settingsFile.Name(), ".tmpl") {
@@ -157,7 +157,7 @@ func (*TemplateParser) marshal(v interface{}) string {
 }
 
 func (t *TemplateParser) include(v interface{}) string {
-	a, _ := ioutil.ReadFile(path.Join(t.Partials, v.(string)))
+	a, _ := os.ReadFile(path.Join(t.Partials, v.(string)))
 	return string(a)
 }
 

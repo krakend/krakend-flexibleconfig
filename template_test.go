@@ -6,7 +6,7 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/Masterminds/sprig"
+	"github.com/Masterminds/sprig/v3"
 	"github.com/luraproject/lura/v2/config"
 )
 
@@ -45,7 +45,7 @@ func ExampleTemplateParser_marshal() {
 			"Port":            1234,
 		},
 		Parser: config.ParserFunc(func(tmpPath string) (config.ServiceConfig, error) {
-			data, err := ioutil.ReadFile(tmpPath)
+			data, err := os.ReadFile(tmpPath)
 			fmt.Println(string(data))
 			if err != nil {
 				fmt.Println(err.Error())
@@ -142,7 +142,7 @@ func ExampleTemplateParser_include() {
 	}
 
 	defer os.Remove(includeTmpfile.Name())
-	if _, err := includeTmpfile.Write([]byte(fmt.Sprintf("{{ include \"%s\" }}", tmpfile.Name()))); err != nil {
+	if _, err := fmt.Fprintf(includeTmpfile, "{{ include \"%s\" }}", tmpfile.Name()); err != nil {
 		fmt.Println(err.Error())
 		return
 	}
@@ -158,7 +158,7 @@ func ExampleTemplateParser_include() {
 	tmpl := TemplateParser{
 		Vars: map[string]interface{}{},
 		Parser: config.ParserFunc(func(tmpPath string) (config.ServiceConfig, error) {
-			data, err := ioutil.ReadFile(tmpPath)
+			data, err := os.ReadFile(tmpPath)
 			fmt.Println(string(data))
 			if err != nil {
 				fmt.Println(err)
