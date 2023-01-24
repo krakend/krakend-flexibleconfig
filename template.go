@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -99,7 +98,7 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 		return config.ServiceConfig{}, t.err
 	}
 
-	tmpfile, err := ioutil.TempFile("", "KrakenD_parsed_config_template_")
+	tmpfile, err := os.CreateTemp("", "KrakenD_parsed_config_template_")
 	if err != nil {
 		log.Fatal("Couldn't create the temporary file:", err)
 	}
