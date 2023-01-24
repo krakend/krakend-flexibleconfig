@@ -39,7 +39,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 		files, err := os.ReadDir(cfg.Settings)
 		if err != nil {
 			t.err.errors[cfg.Settings] = err
-			files = []os.FileInfo{}
+			files = []os.DirEntry{}
 		}
 		for _, settingsFile := range files {
 			if !strings.HasSuffix(settingsFile.Name(), ".json") {
@@ -63,7 +63,7 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 		files, err := os.ReadDir(cfg.Templates)
 		if err != nil {
 			t.err.errors[cfg.Templates] = err
-			files = []os.FileInfo{}
+			files = []os.DirEntry{}
 		}
 		for _, settingsFile := range files {
 			if !strings.HasSuffix(settingsFile.Name(), ".tmpl") {
