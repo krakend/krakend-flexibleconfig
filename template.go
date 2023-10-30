@@ -13,7 +13,6 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
-	kobra "github.com/krakendio/krakend-cobra/v2"
 	"github.com/luraproject/lura/v2/config"
 )
 
@@ -24,9 +23,6 @@ type Config struct {
 	Parser    config.Parser
 	Path      string
 }
-
-// check that we fullfill the LastSourcer interface:
-var _ kobra.LastSourcer = (*TemplateParser)(nil)
 
 func NewTemplateParser(cfg Config) *TemplateParser {
 	t := &TemplateParser{
