@@ -13,6 +13,7 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
+	kobra "github.com/krakendio/krakend-cobra/v2"
 	"github.com/luraproject/lura/v2/config"
 )
 
@@ -23,6 +24,9 @@ type Config struct {
 	Parser    config.Parser
 	Path      string
 }
+
+// check that we fullfill the LastSourcer interface:
+var _ kobra.LastSourcer = (*TemplateParser)(nil)
 
 func NewTemplateParser(cfg Config) *TemplateParser {
 	t := &TemplateParser{
@@ -87,6 +91,8 @@ type TemplateParser struct {
 	Path      string
 	err       parserError
 	funcMap   template.FuncMap
+
+	lastSource []byte
 }
 
 func (t *TemplateParser) AddFunc(name string, f interface{}) {
@@ -141,6 +147,7 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 		return config.ServiceConfig{}, err
 	}
 
+	t.lastSource, _ = os.ReadFile(filename)
 	cfg, err := t.Parser.Parse(filename)
 
 	if t.Path == "" {
@@ -148,6 +155,13 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 	}
 
 	return cfg, err
+}
+
+func (t *TemplateParser) LastSource() ([]byte, error) {
+	if t.lastSource == nil {
+		return nil, fmt.Errorf("no content")
+	}
+	return t.lastSource, nil
 }
 
 func (*TemplateParser) marshal(v interface{}) string {
