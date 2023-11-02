@@ -87,6 +87,8 @@ type TemplateParser struct {
 	Path      string
 	err       parserError
 	funcMap   template.FuncMap
+
+	lastSource []byte
 }
 
 func (t *TemplateParser) AddFunc(name string, f interface{}) {
@@ -141,6 +143,7 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 		return config.ServiceConfig{}, err
 	}
 
+	t.lastSource, _ = os.ReadFile(filename)
 	cfg, err := t.Parser.Parse(filename)
 
 	if t.Path == "" {
@@ -148,6 +151,13 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 	}
 
 	return cfg, err
+}
+
+func (t *TemplateParser) LastSource() ([]byte, error) {
+	if t.lastSource == nil {
+		return nil, fmt.Errorf("no content")
+	}
+	return t.lastSource, nil
 }
 
 func (*TemplateParser) marshal(v interface{}) string {
