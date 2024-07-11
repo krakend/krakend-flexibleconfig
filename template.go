@@ -59,16 +59,25 @@ func NewTemplateParser(cfg Config) *TemplateParser {
 	}
 
 	if cfg.Templates != "" {
-		files, err := os.ReadDir(cfg.Templates)
+		err := filepath.WalkDir(cfg.Templates, func(path string, d os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if d.IsDir() {
+				return nil
+			}
+
+			if !strings.HasSuffix(path, ".tmpl") {
+				return nil
+			}
+
+			t.Templates = append(t.Templates, path)
+
+			return nil
+		})
 		if err != nil {
 			t.err.errors[cfg.Templates] = err
-			files = []os.DirEntry{}
-		}
-		for _, settingsFile := range files {
-			if !strings.HasSuffix(settingsFile.Name(), ".tmpl") {
-				continue
-			}
-			t.Templates = append(t.Templates, filepath.Join(cfg.Templates, settingsFile.Name()))
 		}
 	}
 
