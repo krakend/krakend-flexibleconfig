@@ -202,7 +202,7 @@ func copyFile(src, dst string) (err error) {
 	if err != nil {
 		return
 	}
-	defer in.Close()
+	defer func() { err = in.Close() }()
 
 	out, err := os.Create(dst)
 	if err != nil {
