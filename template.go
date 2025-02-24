@@ -102,7 +102,8 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 
 	tmpfile, err := os.CreateTemp("", "KrakenD_parsed_config_template_")
 	if err != nil {
-		log.Fatal("Couldn't create the temporary file:", err)
+		log.Println("Couldn't create the temporary file:", err)
+		return config.ServiceConfig{}, err
 	}
 
 	defer os.Remove(tmpfile.Name())
@@ -111,28 +112,29 @@ func (t *TemplateParser) Parse(configFile string) (config.ServiceConfig, error) 
 
 	tmpl, err := template.New("config").Funcs(t.funcMap).ParseFiles(configFile)
 	if err != nil {
-		log.Fatal("Unable to parse configuration file:", err)
+		log.Println("Unable to parse configuration file:", err)
 		return t.Parser.Parse(configFile)
 	}
 	if len(t.Templates) > 0 {
 		tmpl, err = tmpl.ParseFiles(t.Templates...)
 		if err != nil {
-			log.Fatal("Error parsing sub-templates:", err)
+			log.Println("Error parsing sub-templates:", err)
 			return t.Parser.Parse(configFile)
 		}
 	}
 	err = tmpl.ExecuteTemplate(&buf, filepath.Base(configFile), t.Vars)
 	if err != nil {
-		log.Fatal("Found error while executing template:", err)
+		log.Println("Found error while executing template:", err)
 		return t.Parser.Parse(configFile)
 	}
 
 	if _, err = tmpfile.Write(buf.Bytes()); err != nil {
-		log.Fatal("Unable to write the temporary configuration file:", err)
+		log.Println("Unable to write the temporary configuration file:", err)
 		return t.Parser.Parse(configFile)
 	}
 	if err = tmpfile.Close(); err != nil {
-		log.Fatal("Unable to close the file after writing:", err)
+		log.Println("Unable to close the file after writing:", err)
+		return config.ServiceConfig{}, err
 	}
 
 	filename := tmpfile.Name() + ".json"
