@@ -1,6 +1,6 @@
 module github.com/krakendio/krakend-flexibleconfig/v2
 
-go 1.20
+go 1.24
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
@@ -18,6 +18,6 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/stretchr/testify v1.8.1 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
 )
