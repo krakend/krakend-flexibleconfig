@@ -1,10 +1,10 @@
-module github.com/krakendio/krakend-flexibleconfig/v2
+module github.com/krakend/krakend-flexibleconfig/v2
 
 go 1.24
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
-	github.com/luraproject/lura/v2 v2.3.0
+	github.com/luraproject/lura/v2 v2.11.0
 )
 
 require (
@@ -17,7 +17,6 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
-	github.com/stretchr/testify v1.8.1 // indirect
-	golang.org/x/crypto v0.35.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/crypto v0.39.0 // indirect
+	golang.org/x/text v0.26.0 // indirect
 )
